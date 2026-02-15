@@ -1,0 +1,32 @@
+# Downloads
+downloads/
+*.mp4
+*.mp3
+*.wav
+*.jpg
+*.png
+!static/screenshots/*.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temp
+*.tmp
+*.log

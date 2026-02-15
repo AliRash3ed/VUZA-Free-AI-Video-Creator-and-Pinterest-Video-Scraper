@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VUZA — Free AI Video Creator | Auto Faceless Video & Money Printer Tool</title>
+    <meta name="description"
+        content="VUZA — Free & open-source AI video creator that actually works. Working alternative to Pictory AI, InVideo AI & MoneyPrinter Turbo. World's first free Pinterest video scraper. Auto faceless videos with free AI voiceover & subtitles. Built by Ali R.">
+    <meta name="keywords"
+        content="VUZA, free ai video creator, faceless video generator, money printer tool, pinterest video scraper, pinterest scraper, free pictory ai alternative, free invideo alternative, moneyprinter turbo, pexels video downloader, pixabay scraper, edge tts, ai voiceover, auto subtitles, open source video tool, python video creator, script to video, tiktok video maker, youtube shorts creator, instagram reels, ai automation, free video generation, content creation tool">
+    <link rel="stylesheet" href="/static/style.css?v=4.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+
+    <!-- ═══ PAGE LAYOUT: Main + Sidebar ═══ -->
+    <div class="page-layout">
+
+        <!-- ═══ RIGHT SIDEBAR AD (sticky) ═══ -->
+        <aside class="sidebar-ad">
+            <div class="promo-sidebar-ad">
+                <div class="ad-label">SPONSORED</div>
+                <div class="ad-content">
+                    <div class="ad-icon">🔥</div>
+                    <h3>Premium AI Tools at 80% OFF</h3>
+                    <p>Get <strong>ChatGPT Plus, Midjourney, Runway ML, Pictory AI, ElevenLabs, Canva Pro</strong> and
+                        50+ more AI tools at up to <strong>80% off</strong> original prices.</p>
+                    <a href="https://take.app/viralzoom" target="_blank" class="ad-btn"><i
+                            class="fas fa-shopping-cart"></i> Visit ViralZoom Store</a>
+                    <a href="https://instagram.com/viral_zoom_agency" target="_blank" class="ad-btn secondary"><i
+                            class="fab fa-instagram"></i> @viral_zoom_agency</a>
+                    <p class="ad-note">Can't find a tool? DM us on Instagram — we'll arrange <strong>any AI
+                            tool</strong> you need! 💬</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <div class="app-wrapper">
+
+            <!-- ═══ HERO SECTION ═══ -->
+            <section class="hero">
+                <div class="hero-badge">🚀 100% FREE & OPEN SOURCE</div>
+                <h1 class="hero-title">
+                    <span class="brand-gradient">VUZA</span>
+                </h1>
+                <p class="hero-subtitle">Video Utility for Zero-cost Automation</p>
+                <p class="hero-desc">A working, open-source version of tools like Pictory AI, InVideo AI & MoneyPrinter
+                    Turbo — that actually works end-to-end. Creates videos from your script automatically using all free
+                    APIs & free voiceover. $0 cost.</p>
+
+                <div class="hero-highlight">
+                    <i class="fas fa-trophy"></i>
+                    <span><strong>World's First:</strong> Free working Pinterest video scraper — no other tool on the
+                        internet has this. Built from scratch because it didn't exist anywhere.</span>
+                </div>
+
+                <div class="hero-features">
+                    <div class="feature-item"><i class="fas fa-robot"></i> AI-powered script analysis & auto keyword
+                        extraction</div>
+                    <div class="feature-item"><i class="fab fa-pinterest-p"></i> First-ever free Pinterest video & photo
+                        scraper</div>
+                    <div class="feature-item"><i class="fas fa-download"></i> Auto-scrape from Pinterest, Pexels &
+                        Pixabay
+                    </div>
+                    <div class="feature-item"><i class="fas fa-microphone"></i> Free AI voiceover with Edge TTS
+                        (multiple
+                        voices)</div>
+                    <div class="feature-item"><i class="fas fa-closed-captioning"></i> Auto-generated subtitles rendered
+                        with PIL</div>
+                    <div class="feature-item"><i class="fas fa-crop-alt"></i> Smart aspect ratio (9:16, 16:9, 1:1)</div>
+                    <div class="feature-item"><i class="fas fa-bolt"></i> Parallel downloading & multi-platform fallback
+                    </div>
+                    <div class="feature-item"><i class="fas fa-palette"></i> 3 AI vibes: Aesthetic, LoFi & General</div>
+                    <div class="feature-item"><i class="fas fa-brain"></i> Custom AI Brain — bring your own API & model
+                    </div>
+                    <div class="feature-item"><i class="fas fa-microchip"></i> Runs on low-spec PCs & minimal internet
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <p class="dev-callout">
+                        <i class="fas fa-code"></i>
+                        <strong>Are you a developer or creator?</strong> If you think you can add even better features
+                        to
+                        VUZA — <strong>DO IT!</strong>
+                        We want to keep VUZA free & open source and make it so feature-rich that people don't need to
+                        pay
+                        for expensive AI video tools. Add features, fix bugs, send pull requests — <strong>I will
+                            approve
+                            all quality PRs.</strong>
+                        Let's build this together and make the biggest free video tool the internet has ever seen. 🔥
+                    </p>
+                </div>
+            </section>
+
+            <!-- ═══ SETTINGS PANEL (collapsible) ═══ -->
+            <div class="settings-panel" id="settings-panel">
+                <button class="settings-toggle" id="settings-toggle" type="button">
+                    <i class="fas fa-cog"></i> API Settings <span class="toggle-hint">(Click to configure)</span>
+                    <i class="fas fa-chevron-down toggle-arrow"></i>
+                </button>
+                <div class="settings-body hidden" id="settings-body">
+                    <p class="settings-note">🔒 All keys are saved locally in your browser. Never sent to any third
+                        party.
+                    </p>
+
+                    <div class="settings-row">
+                        <h4><i class="fas fa-brain"></i> Custom AI Brain (OpenRouter / OpenAI compatible)</h4>
+                        <div class="key-grid">
+                            <div class="key-field">
+                                <label>API Key</label>
+                                <input type="password" id="llm-key" placeholder="sk-or-v1-xxxx..." autocomplete="off">
+                            </div>
+                            <div class="key-field">
+                                <label>API URL</label>
+                                <input type="text" id="llm-url"
+                                    placeholder="https://openrouter.ai/api/v1/chat/completions"
+                                    value="https://openrouter.ai/api/v1/chat/completions">
+                            </div>
+                            <div class="key-field">
+                                <label>Model Name</label>
+                                <input type="text" id="llm-model"
+                                    placeholder="e.g. openai/gpt-4o-mini (leave empty for free models)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <h4><i class="fas fa-image"></i> Stock Media API Keys (Free to get)</h4>
+                        <div class="key-grid two-col">
+                            <div class="key-field">
+                                <label>Pexels API Key <a href="https://www.pexels.com/api/new/" target="_blank"
+                                        class="get-key">Get free key →</a></label>
+                                <input type="password" id="pexels-key" placeholder="Your Pexels API key..."
+                                    autocomplete="off">
+                            </div>
+                            <div class="key-field">
+                                <label>Pixabay API Key <a href="https://pixabay.com/api/docs/" target="_blank"
+                                        class="get-key">Get free key →</a></label>
+                                <input type="password" id="pixabay-key" placeholder="Your Pixabay API key..."
+                                    autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="save-keys-btn" id="save-keys-btn" type="button">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══ MAIN TOOL ═══ -->
+            <div class="main-panel">
+                <div class="mode-tabs">
+                    <button type="button" class="mode-tab active" id="tab-single" data-mode="single">
+                        <i class="fas fa-search"></i> Single Search
+                    </button>
+                    <button type="button" class="mode-tab" id="tab-script" data-mode="script">
+                        <i class="fas fa-scroll"></i> AI Script Mode
+                    </button>
+                </div>
+
+                <div id="single-input-area" class="input-area">
+                    <label for="query">Search Query</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-sparkles input-icon"></i>
+                        <input type="text" id="query" placeholder="e.g. sunset ocean waves, dark city rain..."
+                            autocomplete="off">
+                    </div>
+                </div>
+
+                <div id="script-input-area" class="input-area hidden">
+                    <label for="script">Your Video Script</label>
+                    <textarea id="script"
+                        placeholder="Paste your motivational, educational or any script here...&#10;&#10;AI will analyze each sentence and find matching visuals automatically."></textarea>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <div class="setting-label"><i class="fas fa-globe"></i> Source</div>
+                        <div class="pill-group tri">
+                            <input type="radio" id="src-pinterest" name="source" value="pinterest" checked>
+                            <label for="src-pinterest"><i class="fab fa-pinterest-p"></i> Pinterest</label>
+                            <input type="radio" id="src-pexels" name="source" value="pexels">
+                            <label for="src-pexels"><i class="fas fa-camera"></i> Pexels</label>
+                            <input type="radio" id="src-pixabay" name="source" value="pixabay">
+                            <label for="src-pixabay"><i class="fas fa-star"></i> Pixabay</label>
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label"><i class="fas fa-photo-video"></i> Media</div>
+                        <div class="pill-group">
+                            <input type="radio" id="type-photo" name="media_type" value="photo" checked>
+                            <label for="type-photo"><i class="fas fa-image"></i> Photos</label>
+                            <input type="radio" id="type-video" name="media_type" value="video">
+                            <label for="type-video"><i class="fas fa-video"></i> Videos</label>
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label"><i class="fas fa-palette"></i> AI Vibe</div>
+                        <div class="pill-group tri">
+                            <input type="radio" id="vibe-aesthetic" name="vibe" value="aesthetic" checked>
+                            <label for="vibe-aesthetic"><i class="fas fa-sparkles"></i> Aesthetic</label>
+                            <input type="radio" id="vibe-lofi" name="vibe" value="lofi">
+                            <label for="vibe-lofi"><i class="fas fa-moon"></i> LoFi</label>
+                            <input type="radio" id="vibe-general" name="vibe" value="general">
+                            <label for="vibe-general"><i class="fas fa-globe"></i> General</label>
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label"><i class="fas fa-layer-group"></i> Items: <span id="count-val"
+                                class="highlight">3</span></div>
+                        <input type="range" id="count" min="1" max="15" value="3" class="custom-range"
+                            oninput="document.getElementById('count-val').innerText = this.value">
+                    </div>
+                </div>
+
+                <div class="studio-panel">
+                    <div class="studio-header"><i class="fas fa-film"></i> VIDEO STUDIO</div>
+                    <div class="studio-grid">
+                        <div class="setting-card">
+                            <div class="setting-label">Auto Video</div>
+                            <div class="pill-group">
+                                <input type="radio" id="autovid-on" name="auto_video" value="true" checked>
+                                <label for="autovid-on"><i class="fas fa-magic"></i> On</label>
+                                <input type="radio" id="autovid-off" name="auto_video" value="false">
+                                <label for="autovid-off"><i class="fas fa-ban"></i> Off</label>
+                            </div>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Ratio</div>
+                            <div class="pill-group tri">
+                                <input type="radio" id="ratio-9-16" name="ratio" value="9:16" checked>
+                                <label for="ratio-9-16"><i class="fas fa-mobile-alt"></i> 9:16</label>
+                                <input type="radio" id="ratio-16-9" name="ratio" value="16:9">
+                                <label for="ratio-16-9"><i class="fas fa-tv"></i> 16:9</label>
+                                <input type="radio" id="ratio-1-1" name="ratio" value="1:1">
+                                <label for="ratio-1-1"><i class="fas fa-square"></i> 1:1</label>
+                            </div>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">AI Voice</div>
+                            <select id="voice-select" class="custom-select">
+                                <option value="en-US-ChristopherNeural">🎙️ Christopher</option>
+                                <option value="en-US-JennyNeural">🎤 Jenny</option>
+                                <option value="en-GB-RyanNeural">🇬🇧 Ryan</option>
+                                <option value="en-GB-SoniaNeural">🇬🇧 Sonia</option>
+                                <option value="none">🔇 No Voice</option>
+                            </select>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Subtitles</div>
+                            <div class="pill-group">
+                                <input type="radio" id="subs-on" name="subtitles" value="true" checked>
+                                <label for="subs-on"><i class="fas fa-closed-captioning"></i> On</label>
+                                <input type="radio" id="subs-off" name="subtitles" value="false">
+                                <label for="subs-off"><i class="fas fa-eye-slash"></i> Off</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="scrape-btn" class="action-btn">
+                    <span class="btn-text">Start Extraction</span>
+                    <i class="fas fa-rocket"></i>
+                    <div class="btn-loader hidden"></div>
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+
+            <!-- ═══ STATUS ═══ -->
+            <div class="status-card hidden" id="status-card">
+                <div class="status-row">
+                    <span id="status-msg" class="status-text">Initializing...</span>
+                    <span id="status-percent" class="status-percent">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-bar" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- ═══ PINTEREST SHOWCASE ═══ -->
+            <div class="pinterest-showcase">
+                <div class="showcase-badge">🏆 WORLD'S FIRST</div>
+                <h3><i class="fab fa-pinterest"></i> Free Working Pinterest Video Scraper</h3>
+                <p>Before VUZA, there was <strong>no free tool on the internet</strong> that could scrape videos from
+                    Pinterest. Some tools existed for photos, but they were broken or non-functional.</p>
+                <p>I searched everywhere, couldn't find one — so <strong>I built it from scratch.</strong></p>
+                <div class="showcase-features">
+                    <span><i class="fas fa-check-circle"></i> Searches Pinterest for any keyword</span>
+                    <span><i class="fas fa-check-circle"></i> Extracts pin URLs from search results</span>
+                    <span><i class="fas fa-check-circle"></i> Downloads actual video files via yt-dlp</span>
+                    <span><i class="fas fa-check-circle"></i> Works reliably with Playwright automation</span>
+                </div>
+                <p class="showcase-credit"><i class="fas fa-heart"></i> If you use this Pinterest feature in your
+                    projects,
+                    please give credit to <a href="https://github.com/AliRash3ed" target="_blank">Ali R.
+                        (AliRash3ed)</a>.
+                    This took significant effort and was released for free.</p>
+            </div>
+
+            <!-- ═══ GALLERY ═══ -->
+            <div class="gallery-panel">
+                <div class="gallery-top">
+                    <h2><i class="fas fa-images"></i> Media Gallery</h2>
+                    <button id="clear-gallery" class="clear-btn" title="Clear"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div id="gallery-container">
+                    <div class="empty-state">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        <p>Your downloaded media will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- ═══ UPCOMING FEATURES ═══ -->
+            <div class="upcoming-section">
+                <h3><i class="fas fa-flask"></i> Coming Soon</h3>
+                <div class="upcoming-grid">
+                    <div class="upcoming-item"><i class="fas fa-image"></i> AI Image Generation (Free API)</div>
+                    <div class="upcoming-item"><i class="fas fa-video"></i> AI Video Generation (Free API)</div>
+                    <div class="upcoming-item"><i class="fas fa-music"></i> Background Music Library</div>
+                    <div class="upcoming-item"><i class="fas fa-cloud"></i> Google Colab Support (Free GPU)</div>
+                </div>
+            </div>
+
+            <!-- ═══ FOOTER ═══ -->
+            <footer class="app-footer">
+                <div class="footer-brand">
+                    <h3><span class="brand-gradient">VUZA</span></h3>
+                    <p>Video Utility for Zero-cost Automation</p>
+                </div>
+                <p class="footer-credit">Built with ❤️ by <strong>Ali R.</strong></p>
+                <p class="footer-links">
+                    <a href="https://github.com/AliRash3ed" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                    <a href="https://instagram.com/this_is_ali_r" target="_blank"><i class="fab fa-instagram"></i>
+                        @this_is_ali_r</a>
+                    <a href="https://instagram.com/viral_zoom_agency" target="_blank"><i class="fab fa-instagram"></i>
+                        @viral_zoom_agency</a>
+                    <a href="https://take.app/viralzoom" target="_blank"><i class="fas fa-store"></i> ViralZoom
+                        Store</a>
+                </p>
+                <p class="footer-note">Free &amp; Open Source · PRs Welcome · Star ⭐ on GitHub</p>
+                <p class="footer-note">Includes the world's first free Pinterest video scraper — please give credit when
+                    using it.</p>
+            </footer>
+        </div>
+    </div> <!-- end page-layout -->
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="/static/script.js?v=4.0"></script>
+</body>
+
+</html>
