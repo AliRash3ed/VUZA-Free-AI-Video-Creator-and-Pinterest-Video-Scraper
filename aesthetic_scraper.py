@@ -133,7 +133,7 @@ class PexelsScraper:
                         valid_vids.append((best["link"], vid_id))
                         self.seen_ids.add(vid_id)
                 if len(valid_vids) >= num_videos: break
-            
+
             tasks = [asyncio.to_thread(self.download_file, link, folder / f"vid_{i}.mp4") for i, (link, _) in enumerate(valid_vids)]
             await asyncio.gather(*tasks)
             return [str(f) for f in folder.glob("*.mp4")]
@@ -183,7 +183,7 @@ class PixabayScraper:
                 if vid_id in self.seen_ids: continue
                 if 3 <= h.get("duration", 0) <= 15:
                     v = h["videos"].get("medium") or h["videos"].get("small")
-                    if v: 
+                    if v:
                         valid.append(v["url"])
                         self.seen_ids.add(vid_id)
                 if len(valid) >= num_videos: break
@@ -249,10 +249,10 @@ class LLMProcessor:
         if not self.api_key:
             print("⚠️ LLM API key not set! Please add your AI API key in settings.")
             return []
-        
+
         prompts = {
             "aesthetic": "Break script into sentences. For each, give 1 aesthetic keyword (2-4 words, end with 'aesthetic'). Return: Sentence → keyword",
-            "lofi": """Break script into sentences. For each, give 1 keyword (2-4 words before adding 'lofi art', end with 'lofi art'). 
+            "lofi": """Break script into sentences. For each, give 1 keyword (2-4 words before adding 'lofi art', end with 'lofi art').
 Match lofi-style visuals (rain, solitude, late night, healing, reflection). Return: Sentence → keyword""",
             "general": """Break this script into sentences. For each sentence, give 1 simple and general keyword (1-3 words) that visually represents the meaning of that sentence.
 Rules:
@@ -261,18 +261,75 @@ Rules:
 - Keywords must be generic enough to easily find stock photos/videos on Pexels or Pixabay.
 - Think like a stock video searcher: what simple word would find a matching clip?
 - Avoid abstract or poetic words. Use concrete, visual, real-world words.
-Return format: Sentence → keyword"""
+Return format: Sentence → keyword""",
+            "futuristic": "Break script into sentences. For each, give 1 futuristic/cyberpunk keyword (2-4 words, end with 'futuristic'). Return: Sentence → keyword",
+            "black_and_white": "Break script into sentences. For each, give 1 noir/vintage keyword (2-4 words, end with 'black and white'). Return: Sentence → keyword"
         }
         prompt = prompts.get(vibe, prompts["aesthetic"])
         for m in self.models:
             print(f"🤖 LLM ({m}) | Vibe: {vibe}")
             try:
-                r = requests.post(self.api_url, 
+                r = requests.post(self.api_url,
                                   headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json", "HTTP-Referer": "https://vuza.app"},
                                   data=json.dumps({"model": m, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": script}]}), timeout=30)
                 if r.status_code == 200: return self._parse(r.json()["choices"][0]["message"]["content"])
             except: continue
         return []
+
+    def analyze_for_youtube(self, script):
+        if not self.api_key: return None
+        prompt = """Analyze the following video script and act as a viral YouTube expert.
+Generate:
+1. A viral, high-click-through-rate Title.
+2. An engaging Description including a summary and relevant keywords.
+3. 5-10 trending Hashtags.
+
+Format your response exactly like this:
+TITLE: [Your Title]
+DESCRIPTION: [Your Description]
+HASHTAGS: [Your Hashtags]"""
+        for m in self.models:
+            try:
+                r = requests.post(self.api_url,
+                                  headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+                                  data=json.dumps({"model": m, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": script}]}), timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"]
+                    return self._parse_youtube(content)
+            except: continue
+        return None
+
+    def generate_full_script(self, topic, vibe="general"):
+        if not self.api_key: return None
+        vibe_instr = "educational and informative" if vibe == "educational" else "inspiring and fast-paced" if vibe == "motivational" else "poetic and slow" if vibe == "lofi" else "engaging and viral"
+        prompt = f"""Act as a professional viral script writer for TikTok/Reels/Shorts.
+Write a complete, high-retention video script about the following topic: '{topic}'.
+The vibe should be {vibe_instr}.
+Rules:
+- Length: 5-10 punchy sentences.
+- Each sentence should be on a NEW line.
+- Do NOT include scene descriptions or speaker names. ONLY the text to be spoken.
+- Make it highly engaging with a strong hook at the beginning."""
+        for m in self.models:
+            try:
+                r = requests.post(self.api_url,
+                                  headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+                                  data=json.dumps({"model": m, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": topic}]}), timeout=40)
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"].strip()
+            except: continue
+        return None
+
+    def _parse_youtube(self, text):
+        data = {"title": "", "description": "", "hashtags": ""}
+        title_match = re.search(r'TITLE:\s*(.*)', text, re.IGNORECASE)
+        desc_match = re.search(r'DESCRIPTION:\s*([\s\S]*?)(?=HASHTAGS:|$)', text, re.IGNORECASE)
+        hash_match = re.search(r'HASHTAGS:\s*(.*)', text, re.IGNORECASE)
+
+        if title_match: data["title"] = title_match.group(1).strip()
+        if desc_match: data["description"] = desc_match.group(1).strip()
+        if hash_match: data["hashtags"] = hash_match.group(1).strip()
+        return data
 
     def _parse(self, text):
         res = []
@@ -280,3 +337,62 @@ Return format: Sentence → keyword"""
             if '→' in line:
                 p = line.split('→'); res.append({"sentence": p[0].strip(), "keyword": p[1].strip()})
         return res
+
+    def summarize_url(self, content):
+        """Summarizes scraped web content into a video script."""
+        if not self.api_key: return None
+        prompt = "Act as a viral script writer. Summarize the following web content into a 5-10 sentence punchy video script for TikTok/Shorts. Return ONLY the script sentences, one per line. No scene descriptions."
+        for m in self.models:
+            try:
+                r = requests.post(self.api_url,
+                                  headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+                                  data=json.dumps({"model": m, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": content[:10000]}]}), timeout=30)
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"].strip()
+            except: continue
+        return None
+
+    def generate_image_description(self, sentence):
+        """Generates a detailed visual description for AI image generation fallback."""
+        if not self.api_key: return f"Visual for: {sentence}"
+        prompt = "Describe a high-quality, cinematic stock photo representing this sentence. Return ONLY the description (max 20 words)."
+        for m in self.models:
+            try:
+                r = requests.post(self.api_url,
+                                  headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+                                  data=json.dumps({"model": m, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": sentence}]}), timeout=20)
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"].strip()
+            except: continue
+        return sentence
+
+# ═══════════════════════════════════════════════════════════════
+# WEB SCRAPER (FOR URL TO VIDEO)
+# ═══════════════════════════════════════════════════════════════
+
+class WebScraper:
+    def __init__(self):
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+    async def scrape_url(self, url):
+        """Extracts text content from a URL using Playwright."""
+        print(f"🌐 Scraping URL: {url}")
+        content = ""
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page(user_agent=self.user_agent)
+            try:
+                await page.goto(url, wait_until="networkidle", timeout=60000)
+                # Remove script/style tags
+                await page.evaluate('''() => {
+                    const elements = document.querySelectorAll("script, style, nav, footer, header");
+                    for (const el of elements) el.remove();
+                }''')
+                content = await page.evaluate('() => document.body.innerText')
+                # Clean up whitespace
+                content = re.sub(r'\s+', ' ', content).strip()
+            except Exception as e:
+                print(f"❌ Scrape Error: {e}")
+            finally:
+                await browser.close()
+        return content

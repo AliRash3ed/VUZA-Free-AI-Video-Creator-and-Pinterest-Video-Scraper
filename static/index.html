@@ -62,26 +62,16 @@
                 </div>
 
                 <div class="hero-features">
-                    <div class="feature-item"><i class="fas fa-robot"></i> AI-powered script analysis & auto keyword
-                        extraction</div>
-                    <div class="feature-item"><i class="fab fa-pinterest-p"></i> First-ever free Pinterest video & photo
-                        scraper</div>
-                    <div class="feature-item"><i class="fas fa-download"></i> Auto-scrape from Pinterest, Pexels &
-                        Pixabay
-                    </div>
-                    <div class="feature-item"><i class="fas fa-microphone"></i> Free AI voiceover with Edge TTS
-                        (multiple
-                        voices)</div>
-                    <div class="feature-item"><i class="fas fa-closed-captioning"></i> Auto-generated subtitles rendered
-                        with PIL</div>
-                    <div class="feature-item"><i class="fas fa-crop-alt"></i> Smart aspect ratio (9:16, 16:9, 1:1)</div>
-                    <div class="feature-item"><i class="fas fa-bolt"></i> Parallel downloading & multi-platform fallback
-                    </div>
-                    <div class="feature-item"><i class="fas fa-palette"></i> 3 AI vibes: Aesthetic, LoFi & General</div>
-                    <div class="feature-item"><i class="fas fa-brain"></i> Custom AI Brain — bring your own API & model
-                    </div>
-                    <div class="feature-item"><i class="fas fa-microchip"></i> Runs on low-spec PCs & minimal internet
-                    </div>
+                    <div class="feature-item"><i class="fas fa-robot"></i> AI Viral Analyzer & Smart Script Generator</div>
+                    <div class="feature-item"><i class="fas fa-layer-group"></i> Batch Video Generation (Multiple Scripts)</div>
+                    <div class="feature-item"><i class="fab fa-pinterest-p"></i> World's first free Pinterest video scraper</div>
+                    <div class="feature-item"><i class="fab fa-youtube"></i> Direct YouTube Upload (Data API v3)</div>
+                    <div class="feature-item"><i class="fas fa-microphone"></i> Premium AI Voices (ElevenLabs & Edge TTS)</div>
+                    <div class="feature-item"><i class="fas fa-closed-captioning"></i> High-Retention Dynamic Subtitles</div>
+                    <div class="feature-item"><i class="fas fa-wand-magic-sparkles"></i> Effects, Filters & Background Music</div>
+                    <div class="feature-item"><i class="fas fa-palette"></i> 5 AI Vibes: Aesthetic, LoFi, Futuristic, B&W...</div>
+                    <div class="feature-item"><i class="fas fa-brain"></i> Bring your own AI (OpenRouter / OpenAI)</div>
+                    <div class="feature-item"><i class="fas fa-microchip"></i> 100% Free & Open Source Automation</div>
                 </div>
 
                 <div class="hero-cta">
@@ -133,6 +123,31 @@
                     </div>
 
                     <div class="settings-row">
+                        <h4><i class="fas fa-waveform-lines"></i> ElevenLabs TTS (Premium)</h4>
+                        <div class="key-grid">
+                            <div class="key-field">
+                                <label>ElevenLabs API Key <a href="https://elevenlabs.io/api" target="_blank" class="get-key">Get key →</a></label>
+                                <input type="password" id="eleven-key" placeholder="Your ElevenLabs API key..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <h4><i class="fab fa-youtube"></i> YouTube Direct Upload (Optional)</h4>
+                        <p class="settings-note">📺 <b>Tutorial:</b> Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>, create a project, enable <b>YouTube Data API v3</b>, create <b>OAuth 2.0 Client ID</b> (Desktop App), and download the JSON. Paste the credentials below. <a href="https://github.com/AliRash3ed/VUZA-Free-AI-Video-Creator-and-Pinterest-Video-Scraper#--youtube-api-setup-tutorial" target="_blank"><b>Full Guide Here →</b></a></p>
+                        <div class="key-grid">
+                            <div class="key-field">
+                                <label>Client ID</label>
+                                <input type="password" id="yt-client-id" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off">
+                            </div>
+                            <div class="key-field">
+                                <label>Client Secret</label>
+                                <input type="password" id="yt-client-secret" placeholder="Your Client Secret..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
                         <h4><i class="fas fa-image"></i> Stock Media API Keys (Free to get)</h4>
                         <div class="key-grid two-col">
                             <div class="key-field">
@@ -177,9 +192,43 @@
                 </div>
 
                 <div id="script-input-area" class="input-area hidden">
-                    <label for="script">Your Video Script</label>
-                    <textarea id="script"
-                        placeholder="Paste your motivational, educational or any script here...&#10;&#10;AI will analyze each sentence and find matching visuals automatically."></textarea>
+                    <div class="url-scraper">
+                        <label for="url-input"><i class="fas fa-link"></i> URL to Video (Blog/Article)</label>
+                        <div class="input-with-button">
+                            <input type="text" id="url-input" placeholder="Paste a blog post URL here..." class="input">
+                            <button type="button" id="scrape-url-btn" class="secondary-btn">
+                                <i class="fas fa-file-download"></i> Extract Script
+                            </button>
+                        </div>
+                    </div>
+                    <div class="topic-generator">
+                        <label for="topic-input"><i class="fas fa-lightbulb"></i> Video Topic / Idea</label>
+                        <div class="input-with-button">
+                            <input type="text" id="topic-input" placeholder="e.g. 5 facts about space, motivational story about success..." class="input">
+                            <button type="button" id="generate-script-btn" class="secondary-btn">
+                                <i class="fas fa-magic"></i> Generate Script
+                            </button>
+                        </div>
+                    </div>
+                    <div class="template-selector">
+                        <label for="template-select">Quick Templates</label>
+                        <select id="template-select" class="custom-select">
+                            <option value="">-- Select a Template --</option>
+                            <option value="motivational">🔥 Motivational Quote</option>
+                            <option value="educational">💡 Did You Know? (Educational)</option>
+                            <option value="storytelling">📖 Short Story</option>
+                            <option value="lofi_vibes">🌙 Night Vibes / LoFi</option>
+                            <option value="news">📰 Breaking News</option>
+                            <option value="tutorial">🛠️ Quick Tutorial</option>
+                        </select>
+                    </div>
+                    <label for="script"><i class="fas fa-scroll"></i> Your Video Script</label>
+                    <div id="scripts-container">
+                        <div class="script-item">
+                            <textarea class="script-input" placeholder="Paste your script here..."></textarea>
+                        </div>
+                    </div>
+                    <button type="button" id="add-script-btn" class="secondary-btn"><i class="fas fa-plus"></i> Add Another Script (Batch Mode)</button>
                 </div>
 
                 <div class="settings-grid">
@@ -205,13 +254,17 @@
                     </div>
                     <div class="setting-card">
                         <div class="setting-label"><i class="fas fa-palette"></i> AI Vibe</div>
-                        <div class="pill-group tri">
+                        <div class="pill-group penta">
                             <input type="radio" id="vibe-aesthetic" name="vibe" value="aesthetic" checked>
-                            <label for="vibe-aesthetic"><i class="fas fa-sparkles"></i> Aesthetic</label>
+                            <label for="vibe-aesthetic">✨ Aesthetic</label>
                             <input type="radio" id="vibe-lofi" name="vibe" value="lofi">
-                            <label for="vibe-lofi"><i class="fas fa-moon"></i> LoFi</label>
+                            <label for="vibe-lofi">🌙 LoFi</label>
                             <input type="radio" id="vibe-general" name="vibe" value="general">
-                            <label for="vibe-general"><i class="fas fa-globe"></i> General</label>
+                            <label for="vibe-general">🌍 General</label>
+                            <input type="radio" id="vibe-futuristic" name="vibe" value="futuristic">
+                            <label for="vibe-futuristic">🚀 Futurism</label>
+                            <input type="radio" id="vibe-bw" name="vibe" value="black_and_white">
+                            <label for="vibe-bw">🏁 B&W</label>
                         </div>
                     </div>
                     <div class="setting-card">
@@ -246,6 +299,40 @@
                             </div>
                         </div>
                         <div class="setting-card">
+                            <div class="setting-label">Language</div>
+                            <select id="language-select" class="custom-select">
+                                <option value="en-US">🇺🇸 English (US)</option>
+                                <option value="en-GB">🇬🇧 English (UK)</option>
+                                <option value="es-ES">🇪🇸 Spanish</option>
+                                <option value="fr-FR">🇫🇷 French</option>
+                                <option value="de-DE">🇩🇪 German</option>
+                                <option value="it-IT">🇮🇹 Italian</option>
+                                <option value="hi-IN">🇮🇳 Hindi</option>
+                                <option value="ur-PK">🇵🇰 Urdu</option>
+                                <option value="zh-CN">🇨🇳 Chinese</option>
+                                <option value="ja-JP">🇯🇵 Japanese</option>
+                            </select>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Background Music</div>
+                            <select id="music-select" class="custom-select">
+                                <option value="none">🔇 No Music</option>
+                                <option value="serenity.mp3">🍃 Serenity (Calm)</option>
+                                <option value="adventure.mp3">⚔️ Adventure (Epic)</option>
+                                <option value="lofi.mp3">☕ LoFi Chill</option>
+                                <option value="cinematic.mp3">🎬 Cinematic Mystery</option>
+                            </select>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Video Filter</div>
+                            <select id="filter-select" class="custom-select">
+                                <option value="none">None</option>
+                                <option value="grayscale">Grayscale</option>
+                                <option value="sepia">Sepia</option>
+                                <option value="invert">Invert</option>
+                            </select>
+                        </div>
+                        <div class="setting-card">
                             <div class="setting-label">AI Voice</div>
                             <select id="voice-select" class="custom-select">
                                 <option value="en-US-ChristopherNeural">🎙️ Christopher</option>
@@ -256,6 +343,25 @@
                             </select>
                         </div>
                         <div class="setting-card">
+                            <div class="setting-label">Subtitle Style</div>
+                            <select id="subtitle-style" class="custom-select">
+                                <option value="default">Default (White/Shadow)</option>
+                                <option value="yellow_box">Yellow Box</option>
+                                <option value="bold_outline">Bold Outline</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="high_retention">🔥 High Retention (Punchy)</option>
+                            </select>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">YouTube Upload</div>
+                            <div class="pill-group">
+                                <input type="radio" id="yt-on" name="yt_upload" value="true">
+                                <label for="yt-on"><i class="fas fa-cloud-upload-alt"></i> On</label>
+                                <input type="radio" id="yt-off" name="yt_upload" value="false" checked>
+                                <label for="yt-off"><i class="fas fa-ban"></i> Off</label>
+                            </div>
+                        </div>
+                        <div class="setting-card">
                             <div class="setting-label">Subtitles</div>
                             <div class="pill-group">
                                 <input type="radio" id="subs-on" name="subtitles" value="true" checked>
@@ -264,17 +370,58 @@
                                 <label for="subs-off"><i class="fas fa-eye-slash"></i> Off</label>
                             </div>
                         </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Emoji Subtitles</div>
+                            <div class="pill-group">
+                                <input type="radio" id="emoji-subs-on" name="emoji_subtitles" value="true">
+                                <label for="emoji-subs-on">✨ On</label>
+                                <input type="radio" id="emoji-subs-off" name="emoji_subtitles" value="false" checked>
+                                <label for="emoji-subs-off">🚫 Off</label>
+                            </div>
+                        </div>
+                        <div class="setting-card">
+                            <div class="setting-label">Watermark</div>
+                            <div class="pill-group">
+                                <input type="radio" id="wm-on" name="watermark" value="true">
+                                <label for="wm-on">✅ On</label>
+                                <input type="radio" id="wm-off" name="watermark" value="false" checked>
+                                <label for="wm-off">🚫 Off</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <button id="scrape-btn" class="action-btn">
-                    <span class="btn-text">Start Extraction</span>
-                    <i class="fas fa-rocket"></i>
-                    <div class="btn-loader hidden"></div>
-                    <div class="btn-shine"></div>
-                </button>
+                <div class="action-buttons">
+                    <button id="analyze-btn" class="secondary-btn">
+                        <i class="fas fa-brain"></i> AI YouTube Analyzer
+                    </button>
+                    <button id="scrape-btn" class="action-btn">
+                        <span class="btn-text">Start Extraction</span>
+                        <i class="fas fa-rocket"></i>
+                        <div class="btn-loader hidden"></div>
+                        <div class="btn-shine"></div>
+                    </button>
+                </div>
             </div>
 
+            <!-- ═══ AI ANALYSIS RESULTS ═══ -->
+            <div id="analysis-panel" class="analysis-panel hidden">
+                <div class="studio-header"><i class="fas fa-magic"></i> AI VIRAL ANALYSIS</div>
+                <div class="analysis-body">
+                    <div class="analysis-field">
+                        <label>🚀 Suggested Viral Title</label>
+                        <input type="text" id="ai-title" placeholder="Viral Title will appear here...">
+                    </div>
+                    <div class="analysis-field">
+                        <label>📝 Video Description</label>
+                        <textarea id="ai-desc" placeholder="SEO Description..."></textarea>
+                    </div>
+                    <div class="analysis-field">
+                        <label>#️⃣ Hashtags</label>
+                        <input type="text" id="ai-hashtags" placeholder="#viral #video...">
+                    </div>
+                </div>
+            </div>
             <!-- ═══ STATUS ═══ -->
             <div class="status-card hidden" id="status-card">
                 <div class="status-row">
@@ -328,7 +475,7 @@
                 <div class="upcoming-grid">
                     <div class="upcoming-item"><i class="fas fa-image"></i> AI Image Generation (Free API)</div>
                     <div class="upcoming-item"><i class="fas fa-video"></i> AI Video Generation (Free API)</div>
-                    <div class="upcoming-item"><i class="fas fa-music"></i> Background Music Library</div>
+                    <div class="upcoming-item"><i class="fas fa-language"></i> Multi-language Subtitles</div>
                     <div class="upcoming-item"><i class="fas fa-cloud"></i> Google Colab Support (Free GPU)</div>
                 </div>
             </div>
