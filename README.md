@@ -74,7 +74,17 @@
 - ⚡ **Parallel Processing** — Downloads and searches multiple items simultaneously for 3x faster results
 - 🛡️ **Universal Multi-Platform Fallback** — If one source fails, VUZA automatically tries ALL other sources + simplifies keywords + asks AI for an even simpler keyword. Almost never fails to find matching media.
 - 🧠 **Custom AI Brain** — Bring your own API key, URL & model name. Works with **OpenRouter** (has free models!), **OpenAI**, **DeepSeek**, or any OpenAI-compatible API
-- 🎨 **3 AI Vibe Modes** — Aesthetic, LoFi Art, and General — each generates different style search keywords
+- 🎨 **5 AI Vibe Modes** — Aesthetic, LoFi Art, General, Futuristic, and Black & White.
+- 🪄 **AI YouTube Analyzer** — Expert script analysis to generate viral titles, descriptions, and trending hashtags.
+- 📦 **Batch Video Generation** — Create multiple videos at once by adding multiple scripts.
+- 🎼 **Background Music Library** — Choose from a selection of royalty-free background tracks.
+- 🎭 **Subtitle Styling & Effects** — Choose from multiple built-in styles like "Yellow Box", "Bold Outline", and "High-Retention" (Hormozi-style).
+- 🎬 **Advanced Scene Transitions** — AI-powered random transitions including **Zoom In/Out**, **Glitch**, **Slide**, and **Fade**.
+- 🎬 **Video Filters** — Apply cinematic filters (Grayscale, Sepia, Invert) and Vibe-based color grading (Futuristic, B&W).
+- 🖼️ **Auto-Thumbnail Creator & AI Prompt** — Extracts video frames and generates detailed AI Image Prompts for high-CTR thumbnails.
+- 🔍 **Ken Burns Effect** — Automatic slow zoom-in for image-based clips for more dynamic visuals.
+- 📤 **YouTube Direct Upload** — Post your videos directly to YouTube from VUZA (OAuth2 supported).
+- 🌍 **Multi-language Support** — Voiceover and subtitles in 10+ languages including Spanish, French, Hindi, Urdu, Chinese, and Japanese.
 - 💻 **Runs on Low-Spec PCs** — No GPU required! Works on any computer with even minimal internet speed
 - 🔑 **Privacy-First API Key Storage** — All your API keys are saved only in your browser's localStorage. They are never sent to any server except the API endpoints you configure.
 - 📌 **World's First Pinterest Video Scraper** — The only free tool that can scrape videos from Pinterest (see section above)
@@ -173,7 +183,7 @@ python app.py
 
 ### API Keys Setup (All Free!)
 
-VUZA uses **100% free APIs**. Getting keys takes 2 minutes:
+VUZA uses **100% free APIs** (except ElevenLabs which is optional). Getting keys takes 2 minutes:
 
 | Service | Get Free Key | What It Does |
 |---------|-------------|-------------|
@@ -278,13 +288,24 @@ python app.py
 - [x] ✅ Privacy-first API key storage (browser localStorage only)
 - [x] ✅ Google Colab support with T4 GPU
 - [x] ✅ Universal search with keyword simplification
+- [x] ✅ Background music library (Serenity, Adventure, LoFi, Cinematic)
+- [x] ✅ Batch video generation (multiple videos at once)
+- [x] ✅ Video templates for different niches (Motivational, Educational, News, etc.)
+- [x] ✅ Multi-language voiceover & subtitles (10+ languages)
+- [x] ✅ Direct upload to YouTube (OAuth2)
+- [x] ✅ AI Script Generator (Topic-to-Script)
+- [x] ✅ ElevenLabs TTS Support (Premium voices)
+- [x] ✅ High-Retention Subtitles (Punchy, centered, 3-word chunks)
+- [x] ✅ AI YouTube Analyzer (Viral titles, descriptions, hashtags)
+- [x] ✅ **URL to Video** — Scrape any blog post or news article and turn it into a video automatically.
+- [x] ✅ **"Hormozi-Style" Dynamic Captions** — High-energy, colorful, word-by-word subtitles with auto-emoji insertion.
+- [x] ✅ **AI Visual Fallback (Pollinations.ai)** — If stock media is missing, VUZA uses AI to generate high-quality cinematic images.
+- [x] ✅ **Auto-Thumbnail Creator** — Generates a high-CTR YouTube thumbnail using frames from your video and viral titles.
+- [x] ✅ **Watermarking & Branding** — Add your own logo or watermark to all your videos automatically.
+- [x] ✅ **Custom Voice IDs** — Support for voice cloning and specific custom voices from ElevenLabs.
 - [ ] 🔜 AI Image Generation (Free API)
 - [ ] 🔜 AI Video Generation (Free API)
-- [ ] 🔜 Background music library
-- [ ] 🔜 Batch video generation (multiple videos at once)
-- [ ] 🔜 Video templates for different niches
-- [ ] 🔜 Multi-language voiceover & subtitles
-- [ ] 🔜 Direct upload to YouTube, TikTok, Instagram
+- [ ] 🔜 Direct upload to TikTok, Instagram
 
 ---
 
@@ -307,11 +328,8 @@ python app.py
 
 - 🖼️ **AI Image Generation** — Generate custom images with free AI APIs (no stock needed!)
 - 🎥 **AI Video Generation** — Generate video clips with free AI models
-- 🎵 **Background Music Library** — Add royalty-free music to your videos
-- 📦 **Batch Video Generation** — Generate multiple videos from multiple scripts at once
-- 🎨 **Template System** — Pre-built video templates for different niches (motivational, educational, storytelling, etc.)
-- 🌍 **Multi-Language Support** — Voiceover and subtitles in any language
-- 📤 **Direct Upload** — Post directly to YouTube, TikTok, Instagram from VUZA
+- 📤 **Direct Upload to TikTok & Instagram** — Expand your reach beyond YouTube.
+- ☁️ **Cloud Storage Integration** — Auto-save your videos to Google Drive or Dropbox.
 
 ---
 
@@ -375,3 +393,28 @@ MIT License — Use it, modify it, share it, sell it. Just give credit.
 **Keywords:** VUZA, free ai video creator, open source faceless video generator, money printer tool, free video maker, pictory ai alternative, invideo ai alternative, moneyprinter turbo alternative, pinterest video scraper, free pinterest scraper, pinterest video downloader, ai video automation, auto video creator, edge tts video, free voiceover tool, pexels video downloader, pixabay scraper, ai content creation tool, tiktok video maker, youtube shorts creator, instagram reels generator, faceless youtube channel, ai money printer, free video generation, open source video tool, python video creator, script to video ai, auto faceless video, ai short video generator, free ai voiceover, auto subtitle generator, video utility zero cost automation, free alternative pictory, free alternative invideo
 
 </div>
+
+## 📺 YouTube API Setup Tutorial
+
+To use the **Direct Upload to YouTube** feature, you need to set up a Google Cloud Project:
+
+1.  **Go to Google Cloud Console:** [console.cloud.google.com](https://console.cloud.google.com/)
+2.  **Create a New Project:** Give it a name like "VUZA Video Creator".
+3.  **Enable YouTube Data API v3:**
+    - Go to "APIs & Services" > "Library".
+    - Search for "YouTube Data API v3" and click **Enable**.
+4.  **Configure OAuth Consent Screen:**
+    - Go to "APIs & Services" > "OAuth consent screen".
+    - Choose "External", fill in basic app info (name, email).
+    - Add the scope: `.../auth/youtube.upload`.
+5.  **Create Credentials:**
+    - Go to "APIs & Services" > "Credentials".
+    - Click "Create Credentials" > "OAuth 2.0 Client ID".
+    - Select **Desktop App** as the Application Type.
+    - Click **Create**.
+6.  **Get your Client ID & Secret:**
+    - Download the JSON or copy the Client ID and Client Secret.
+    - Paste them into VUZA's **API Settings** panel.
+7.  **First Upload:** The first time you upload, a browser window will open asking you to log in and authorize the app.
+
+---
