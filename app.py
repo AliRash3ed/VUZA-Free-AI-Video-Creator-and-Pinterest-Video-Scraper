@@ -90,7 +90,7 @@ async def analyze_script(request: ScrapeRequest):
 
     api_keys = request.api_keys or ApiKeys()
     llm = LLMProcessor(api_key=api_keys.llm_key, api_url=api_keys.llm_url, model=api_keys.llm_model)
-    analysis = llm.analyze_for_youtube(request.script)
+    analysis = llm.generate_viral_metadata(request.script)
 
     if not analysis:
         raise HTTPException(status_code=500, detail="Analysis failed. Check your AI API key.")
@@ -286,7 +286,7 @@ async def run_scrape(request: ScrapeRequest):
                         sem = asyncio.Semaphore(3)
                         async def sem_voiceover(text, i):
                             async with sem:
-                                return await engine.generate_voiceover(text, i, voice=voice)
+                                return await engine.generate_voiceover(text, i, voice=voice, language=settings.language)
                         await asyncio.gather(*[sem_voiceover(item["sentence"], idx) for idx, item in enumerate(keyword_data)])
 
                     scraping_status["message"] = f"🎬 Assembling Video {script_idx+1}/{len(scripts)}..."

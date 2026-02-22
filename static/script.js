@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiTitle = document.getElementById('ai-title');
     const aiDesc = document.getElementById('ai-desc');
     const aiHashtags = document.getElementById('ai-hashtags');
+    const aiThumbPrompt = document.getElementById('ai-thumb-prompt');
 
     const tabSingle = document.getElementById('tab-single');
     const tabScript = document.getElementById('tab-script');
@@ -338,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     aiTitle.value = data.title;
                     aiDesc.value = data.description;
                     aiHashtags.value = data.hashtags;
+                    if (aiThumbPrompt) aiThumbPrompt.value = data.thumbnail_prompt || "";
                     analysisPanel.classList.remove('hidden');
                     showToast('✅ Analysis complete!', 'success');
                 } else {

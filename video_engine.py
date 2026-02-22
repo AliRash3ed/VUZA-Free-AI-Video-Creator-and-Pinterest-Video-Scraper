@@ -15,6 +15,27 @@ def apply_ken_burns(clip, duration):
     # Slow zoom from 1.0 to 1.1 over duration
     return clip.resized(lambda t: 1 + 0.1 * t / duration)
 
+def apply_zoom_in(clip, duration):
+    """Dramatic zoom in."""
+    return clip.resized(lambda t: 1 + 0.3 * t / duration)
+
+def apply_zoom_out(clip, duration):
+    """Dramatic zoom out."""
+    return clip.resized(lambda t: 1.3 - 0.3 * t / duration)
+
+def apply_slide_left(clip, duration):
+    """Slides the clip from right to left."""
+    w, h = clip.size
+    return clip.with_position(lambda t: (max(0, w * (1 - 5*t/duration)), "center"))
+
+def apply_glitch(clip, duration):
+    """Simulates a glitch effect by random shifting."""
+    def glitch_pos(t):
+        if random.random() > 0.9:
+            return (random.randint(-20, 20), random.randint(-20, 20))
+        return ("center", "center")
+    return clip.with_position(glitch_pos)
+
 class SubtitleHelper:
     @staticmethod
     def insert_emojis(text):
@@ -48,10 +69,26 @@ class VideoEngine:
     def set_eleven_key(self, key):
         self.eleven_key = key
 
-    async def generate_voiceover(self, text, idx, voice="en-US-ChristopherNeural"):
+    async def generate_voiceover(self, text, idx, voice="en-US-ChristopherNeural", language="en-US"):
         """Generates TTS audio for a single sentence with retries. Supports Edge-TTS and ElevenLabs."""
         if not text or not text.strip():
             return None
+
+        # Language-based voice fallback if voice is not provided or "default"
+        if not voice or voice == "default":
+            voice_defaults = {
+                "en-US": "en-US-ChristopherNeural",
+                "en-GB": "en-GB-RyanNeural",
+                "es-ES": "es-ES-AlvaroNeural",
+                "fr-FR": "fr-FR-HenriNeural",
+                "de-DE": "de-DE-ConradNeural",
+                "it-IT": "it-IT-DiegoNeural",
+                "hi-IN": "hi-IN-MadhurNeural",
+                "ur-PK": "ur-PK-AsadNeural",
+                "zh-CN": "zh-CN-YunyangNeural",
+                "ja-JP": "ja-JP-KeitaNeural"
+            }
+            voice = voice_defaults.get(language, "en-US-ChristopherNeural")
 
         if voice.startswith("eleven_"):
             return await self._generate_elevenlabs(text, idx, voice.replace("eleven_", ""))
@@ -297,9 +334,19 @@ class VideoEngine:
                 elif settings.filter == "invert":
                     visual_clip = visual_clip.with_effects([vfx.InvertColors()])
 
-            # Apply Fade Transitions
+            # Apply Random Transitions & Animations
             from moviepy.video import fx as vfx
-            visual_clip = visual_clip.with_effects([vfx.FadeIn(0.5), vfx.FadeOut(0.5)])
+
+            trans_type = random.choice(["fade", "zoom_in", "zoom_out", "glitch", "none"])
+            if trans_type == "fade":
+                visual_clip = visual_clip.with_effects([vfx.FadeIn(0.5), vfx.FadeOut(0.5)])
+            elif trans_type == "zoom_in":
+                visual_clip = apply_zoom_in(visual_clip, duration)
+            elif trans_type == "zoom_out":
+                visual_clip = apply_zoom_out(visual_clip, duration)
+            elif trans_type == "glitch":
+                visual_clip = apply_glitch(visual_clip, duration)
+
             visual_clip = visual_clip.with_audio(audio_clip)
 
             # Add Subtitles
@@ -361,12 +408,14 @@ class VideoEngine:
                         elif current_style == "minimal":
                             draw.text((x, y), full_text, font=font, fill="white", align="center")
                         elif current_style == "high_retention":
-                            # Big bold text with shadow
+                            # Big bold text with shadow and random colors (Yellow, Green, White)
                             shadow_color = "black"
                             for adj in range(-4, 5):
                                 for adj2 in range(-4, 5):
                                     draw.text((x+adj, y+adj2), full_text, font=font, fill=shadow_color, align="center")
-                            draw.text((x, y), full_text, font=font, fill="#ffdd00", align="center") # Yellowish
+
+                            color = random.choice(["#ffdd00", "#00ff00", "#ffffff"]) # Yellow, Green, White
+                            draw.text((x, y), full_text, font=font, fill=color, align="center")
                         else: # Default
                             shadow_color = "black"
                             for adj in range(-2, 3):
@@ -391,8 +440,9 @@ class VideoEngine:
                         for idx, chunk in enumerate(chunks):
                             t_img = make_text_image(chunk, visual_clip.w, visual_clip.h, style)
                             t_clip = ImageClip(t_img).with_duration(chunk_duration).with_start(idx * chunk_duration)
-                            # Add a small pop effect
-                            t_clip = t_clip.resized(lambda t: 1.0 + 0.05 * (1 - (t/chunk_duration)))
+                            # Add a energetic pop effect and fast fade-in
+                            t_clip = t_clip.resized(lambda t: 1.0 + 0.2 * (1 - (t/chunk_duration)))
+                            t_clip = t_clip.with_opacity(lambda t: min(1.0, 5 * t / chunk_duration))
                             subs_clips.append(t_clip)
 
                         visual_clip = CompositeVideoClip([visual_clip] + subs_clips)

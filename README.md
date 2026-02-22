@@ -78,8 +78,10 @@
 - 🪄 **AI YouTube Analyzer** — Expert script analysis to generate viral titles, descriptions, and trending hashtags.
 - 📦 **Batch Video Generation** — Create multiple videos at once by adding multiple scripts.
 - 🎼 **Background Music Library** — Choose from a selection of royalty-free background tracks.
-- 🎭 **Subtitle Styling & Effects** — Choose from multiple built-in styles like "Yellow Box" and "Bold Outline".
-- 🎬 **Video Filters & Transitions** — Apply cinematic filters (Grayscale, Sepia, Invert) and smooth fade transitions.
+- 🎭 **Subtitle Styling & Effects** — Choose from multiple built-in styles like "Yellow Box", "Bold Outline", and "High-Retention" (Hormozi-style).
+- 🎬 **Advanced Scene Transitions** — AI-powered random transitions including **Zoom In/Out**, **Glitch**, **Slide**, and **Fade**.
+- 🎬 **Video Filters** — Apply cinematic filters (Grayscale, Sepia, Invert) and Vibe-based color grading (Futuristic, B&W).
+- 🖼️ **Auto-Thumbnail Creator & AI Prompt** — Extracts video frames and generates detailed AI Image Prompts for high-CTR thumbnails.
 - 🔍 **Ken Burns Effect** — Automatic slow zoom-in for image-based clips for more dynamic visuals.
 - 📤 **YouTube Direct Upload** — Post your videos directly to YouTube from VUZA (OAuth2 supported).
 - 🌍 **Multi-language Support** — Voiceover and subtitles in 10+ languages including Spanish, French, Hindi, Urdu, Chinese, and Japanese.

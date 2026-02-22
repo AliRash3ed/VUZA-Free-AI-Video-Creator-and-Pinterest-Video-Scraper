@@ -276,18 +276,20 @@ Return format: Sentence → keyword""",
             except: continue
         return []
 
-    def analyze_for_youtube(self, script):
+    def generate_viral_metadata(self, script):
         if not self.api_key: return None
         prompt = """Analyze the following video script and act as a viral YouTube expert.
 Generate:
 1. A viral, high-click-through-rate Title.
 2. An engaging Description including a summary and relevant keywords.
 3. 5-10 trending Hashtags.
+4. A detailed AI Image Generation Prompt for a high-CTR thumbnail (for Midjourney/DALL-E).
 
 Format your response exactly like this:
 TITLE: [Your Title]
 DESCRIPTION: [Your Description]
-HASHTAGS: [Your Hashtags]"""
+HASHTAGS: [Your Hashtags]
+THUMBNAIL_PROMPT: [Your AI Image Prompt]"""
         for m in self.models:
             try:
                 r = requests.post(self.api_url,
@@ -321,14 +323,16 @@ Rules:
         return None
 
     def _parse_youtube(self, text):
-        data = {"title": "", "description": "", "hashtags": ""}
+        data = {"title": "", "description": "", "hashtags": "", "thumbnail_prompt": ""}
         title_match = re.search(r'TITLE:\s*(.*)', text, re.IGNORECASE)
         desc_match = re.search(r'DESCRIPTION:\s*([\s\S]*?)(?=HASHTAGS:|$)', text, re.IGNORECASE)
-        hash_match = re.search(r'HASHTAGS:\s*(.*)', text, re.IGNORECASE)
+        hash_match = re.search(r'HASHTAGS:\s*([\s\S]*?)(?=THUMBNAIL_PROMPT:|$)', text, re.IGNORECASE)
+        thumb_match = re.search(r'THUMBNAIL_PROMPT:\s*(.*)', text, re.IGNORECASE)
 
         if title_match: data["title"] = title_match.group(1).strip()
         if desc_match: data["description"] = desc_match.group(1).strip()
         if hash_match: data["hashtags"] = hash_match.group(1).strip()
+        if thumb_match: data["thumbnail_prompt"] = thumb_match.group(1).strip()
         return data
 
     def _parse(self, text):
