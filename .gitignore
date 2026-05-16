@@ -5,6 +5,8 @@ downloads/
 *.wav
 *.jpg
 *.png
+!static/music/
+!static/music/cinematic.mp3
 !static/screenshots/*.png
 
 # Python
