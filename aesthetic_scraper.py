@@ -7,7 +7,6 @@ import sys
 import time
 from pathlib import Path
 from urllib.parse import quote, urlparse, unquote
-from playwright.async_api import async_playwright
 import yt_dlp
 from tqdm import tqdm
 from PIL import Image
@@ -20,6 +19,13 @@ for stream in (sys.stdout, sys.stderr):
 # VUZA — Video Utility for Zero-cost Automation
 # Built by Ali R. | github.com/AliRash3ed
 # ═══════════════════════════════════════════════════════════════
+
+def get_async_playwright():
+    try:
+        from playwright.async_api import async_playwright
+    except ModuleNotFoundError as exc:
+        raise RuntimeError("Pinterest 和网页链接抓取需要安装 Playwright：pip install playwright && playwright install chromium") from exc
+    return async_playwright
 
 class PinterestScraper:
     def __init__(self, output_dir="downloads/pinterest"):
@@ -38,7 +44,7 @@ class PinterestScraper:
         search_url = f"https://www.pinterest.com/search/{media_type}/?q={quote(query)}"
         print(f"🔍 Searching Pinterest {media_type}: {query}")
         pins = []
-        async with async_playwright() as p:
+        async with get_async_playwright()() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(user_agent=self.user_agent)
             try:
@@ -64,7 +70,7 @@ class PinterestScraper:
         results = []
         for i, pin_url in enumerate(urls[:num_images*2]):
             try:
-                async with async_playwright() as p:
+                async with get_async_playwright()() as p:
                     browser = await p.chromium.launch(headless=True)
                     page = await browser.new_page(user_agent=self.user_agent)
                     await page.goto(pin_url, wait_until="networkidle", timeout=30000)
@@ -716,7 +722,7 @@ class WebScraper:
         """Extracts text content from a URL using Playwright."""
         print(f"🌐 Scraping URL: {url}")
         content = ""
-        async with async_playwright() as p:
+        async with get_async_playwright()() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(user_agent=self.user_agent)
             try:

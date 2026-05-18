@@ -50,18 +50,18 @@
                     <span class="brand-gradient">VUZA</span>
                 </h1>
                 <p class="hero-subtitle">零成本自动化视频生成工具</p>
-                <p class="hero-desc">输入一个悬疑点子或旁白脚本，VUZA 会自动生成分镜关键词、抓取免费素材、生成中文旁白、添加字幕并合成竖屏短视频。</p>
+                <p class="hero-desc">输入一个悬疑点子或旁白脚本，VUZA 会自动生成分镜关键词、用 Seedream 生成镜头画面、生成中文旁白、添加字幕并合成竖屏短视频。</p>
 
                 <div class="hero-highlight">
                     <i class="fas fa-trophy"></i>
-                    <span><strong>当前默认:</strong> 中文悬疑剧情模板、Pexels/Pixabay 免费素材、中文配音、高留存字幕、9:16 竖屏输出。</span>
+                    <span><strong>当前默认:</strong> 中文悬疑剧情模板、Seedream 4.5 AI 生图、中文配音、高留存字幕、9:16 竖屏输出。</span>
                 </div>
 
                 <div class="hero-features">
                     <div class="feature-item"><i class="fas fa-robot"></i> AI 生成中文悬疑脚本</div>
                     <div class="feature-item"><i class="fas fa-layer-group"></i> 支持多脚本批量生成</div>
-                    <div class="feature-item"><i class="fas fa-camera"></i> 免费素材自动检索</div>
-                    <div class="feature-item"><i class="fas fa-image"></i> 素材不足时 AI 图片兜底</div>
+                    <div class="feature-item"><i class="fas fa-camera"></i> Seedream 生成镜头画面</div>
+                    <div class="feature-item"><i class="fas fa-image"></i> Seedream 4.5 AI 生图</div>
                     <div class="feature-item"><i class="fas fa-microphone"></i> Edge TTS 中文旁白</div>
                     <div class="feature-item"><i class="fas fa-closed-captioning"></i> 高留存中文大字幕</div>
                     <div class="feature-item"><i class="fas fa-wand-magic-sparkles"></i> 滤镜、转场与背景音乐</div>
@@ -125,7 +125,7 @@
 
                     <div class="settings-row">
                         <h4><i class="fas fa-wand-magic-sparkles"></i> 豆包 Seedream 4.5 生图</h4>
-                        <p class="settings-note">AI 生图素材会优先使用这里的 Seedream 4.5；不填时才退回免费 Pollinations。</p>
+                        <p class="settings-note">AI 生图/自动合成需要同时配置 AI 文本密钥和 Seedream 4.5；当前默认不启用 Pollinations 兜底。</p>
                         <div class="key-grid">
                             <div class="key-field">
                                 <label>火山方舟 API Key <a href="https://console.volcengine.com/ark" target="_blank" class="get-key">打开控制台 →</a></label>
@@ -207,7 +207,7 @@
                     <label for="query">素材搜索词 / 视频主题</label>
                     <div class="input-wrapper">
                         <i class="fas fa-sparkles input-icon"></i>
-                            <input type="text" id="query" placeholder="搜素材：昏暗走廊；AI 生图 + 自动合成开启时：输入主题即可一键生成视频"
+                            <input type="text" id="query" placeholder="搜素材：昏暗走廊；单搜/主题 + AI 生图 + 自动合成开启时：输入主题即可一键生成视频"
                             autocomplete="off">
                     </div>
                 </div>
@@ -342,11 +342,8 @@
                         <div class="setting-card">
                             <div class="setting-label">背景音乐</div>
                             <select id="music-select" class="custom-select">
-                                <option value="none">🔇 无音乐</option>
-                                <option value="serenity.mp3">🍃 平静</option>
-                                <option value="adventure.mp3">⚔️ 史诗</option>
-                                <option value="lofi.mp3">☕ 低保真氛围</option>
-                                <option value="cinematic.mp3" selected>🎬 悬疑氛围</option>
+                                <option value="none" selected>🔇 无音乐</option>
+                                <option value="cinematic.mp3">🎬 悬疑氛围</option>
                             </select>
                         </div>
                         <div class="setting-card">
@@ -363,7 +360,7 @@
                             <select id="voice-select" class="custom-select">
                                 <option value="zh-CN-YunyangNeural" selected>🇨🇳 云扬（男声）</option>
                                 <option value="zh-CN-XiaoxiaoNeural">🇨🇳 晓晓（女声）</option>
-                                <option value="none">🔇 不配音</option>
+                                <option value="none">🔇 不配音（仅素材模式）</option>
                             </select>
                         </div>
                         <div class="setting-card">
@@ -465,7 +462,7 @@
             <div class="pinterest-showcase">
                 <div class="showcase-badge">可选功能</div>
                 <h3><i class="fab fa-pinterest"></i> Pinterest 素材抓取</h3>
-                <p>VUZA 保留了 Pinterest 素材抓取能力，但中文悬疑模板默认使用 Pexels / Pixabay，稳定性和版权风险更友好。</p>
+                <p>VUZA 保留了 Pinterest、Pexels 和 Pixabay 素材抓取能力；中文悬疑模板默认使用 Seedream 4.5 AI 生图，素材来源可按需切换。</p>
                 <p>如果你要用 Pinterest，请注意素材授权和平台规则。</p>
                 <div class="showcase-features">
                     <span><i class="fas fa-check-circle"></i> 按关键词搜索素材</span>
@@ -496,7 +493,7 @@
             <div class="upcoming-section">
                 <h3><i class="fas fa-flask"></i> 后续功能</h3>
                 <div class="upcoming-grid">
-                    <div class="upcoming-item"><i class="fas fa-image"></i> 免费 AI 图片生成</div>
+                    <div class="upcoming-item"><i class="fas fa-image"></i> 更多可选 AI 图片源</div>
                     <div class="upcoming-item"><i class="fas fa-video"></i> 免费 AI 视频生成</div>
                     <div class="upcoming-item"><i class="fas fa-language"></i> 多语言字幕</div>
                     <div class="upcoming-item"><i class="fas fa-cloud"></i> Google Colab 支持</div>

@@ -112,6 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('vuza_api_keys', JSON.stringify(keys));
     }
 
+    async function readErrorMessage(response, fallback) {
+        try {
+            const err = await response.json();
+            const message = err.detail || err.message;
+            if (typeof message === 'string') return message;
+            if (message) return JSON.stringify(message);
+            return fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
     function showApiSettings() {
         if (settingsBody && settingsBody.classList.contains('hidden')) {
             settingsBody.classList.remove('hidden');
@@ -256,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateVoices() {
         const lang = languageSelect.value;
         const voices = voiceMap[lang] || [];
-        voiceSelect.innerHTML = voices.map(v => `<option value="${v.value}">${v.name}</option>`).join('') + '<option value="none">🔇 不配音</option>';
+        voiceSelect.innerHTML = voices.map(v => `<option value="${v.value}">${v.name}</option>`).join('') + '<option value="none">🔇 不配音（仅素材模式）</option>';
     }
 
     function applySuspenseDefaults() {
@@ -280,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (voiceSelect) voiceSelect.value = 'zh-CN-YunyangNeural';
 
         const musicSelect = document.getElementById('music-select');
-        if (musicSelect) musicSelect.value = 'cinematic.mp3';
+        if (musicSelect) musicSelect.value = 'none';
 
         const subtitleStyle = document.getElementById('subtitle-style');
         if (subtitleStyle) subtitleStyle.value = 'high_retention';
@@ -336,8 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('✅ 已提取并总结成脚本', 'success');
                     }
                 } else {
-                    const err = await response.json();
-                    showToast(err.detail || '提取失败', 'error');
+                    showToast(await readErrorMessage(response, '提取失败'), 'error');
                 }
             } catch (error) {
                 showToast('网络错误', 'error');
@@ -390,8 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('✅ 脚本生成成功', 'success');
                     }
                 } else {
-                    const err = await response.json();
-                    showToast(err.detail || '脚本生成失败', 'error');
+                    showToast(await readErrorMessage(response, '脚本生成失败'), 'error');
                 }
             } catch (error) {
                 showToast('网络错误', 'error');
@@ -444,8 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     analysisPanel.classList.remove('hidden');
                     showToast('✅ 分析完成', 'success');
                 } else {
-                    const err = await response.json();
-                    showToast(err.detail || '分析失败', 'error');
+                    showToast(await readErrorMessage(response, '分析失败'), 'error');
                 }
             } catch (error) {
                 showToast('网络错误', 'error');
@@ -487,16 +496,44 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get saved API keys
         const keys = getKeys();
 
-        if (source === 'ai' && autoVideo && (!keys.llm_key || !keys.seedream_key)) {
+        const allowedMusic = new Set(['none', 'cinematic.mp3']);
+        if (!allowedMusic.has(music)) {
+            showToast('背景音乐选项无效，请重新选择', 'error');
+            return;
+        }
+
+        if (source === 'ai' && mediaType !== 'photo') {
+            showToast('AI 生图模式当前只支持图片素材；如需视频素材，请切换到素材来源', 'error');
+            return;
+        }
+
+        if (autoVideo && voice === 'none') {
+            showToast('自动合成视频需要选择一个 AI 配音；如需不配音，请先关闭自动合成视频', 'error');
+            return;
+        }
+
+        if (autoVideo && currentMode === 'single' && source !== 'ai') {
+            showToast('单条素材搜索不会自动合成视频；请切换到脚本模式，或关闭自动合成视频', 'error');
+            return;
+        }
+
+        if (source === 'ai' && (!keys.llm_key || !keys.seedream_key)) {
             showApiSettings();
             const missing = [];
             if (!keys.llm_key) missing.push('AI 文本密钥');
             if (!keys.seedream_key) missing.push('Seedream 生图密钥');
-            showToast(`请先填写 ${missing.join(' 和 ')}，才能使用 AI 生图自动合成视频`, 'error');
+            showToast(`请先填写 ${missing.join(' 和 ')}，才能使用 Seedream AI 生图`, 'error');
+            return;
+        }
+
+        if (currentMode === 'script' && source !== 'ai' && !keys.llm_key) {
+            showApiSettings();
+            showToast('脚本模式使用素材来源需要先填写 AI 文本密钥，用于分镜关键词分析', 'error');
             return;
         }
 
         setLoading(true);
+        finalVideoUrl = '';
         pollConnectionErrorShown = false;
         galleryContainer.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>VUZA 正在处理，请稍等...</p></div>';
 
@@ -539,8 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('🚀 已开始生成', 'success');
                 startPollingStatus();
             } else {
-                const err = await response.json();
-                showToast(err.message || '启动失败', 'error');
+                showToast(await readErrorMessage(response, '启动失败'), 'error');
                 setLoading(false);
             }
         } catch (error) {
@@ -597,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateGallery([]);
             }
 
-            if (status.is_running || status.progress > 0 || (status.results && status.results.length > 0)) {
+            if (status.is_running || normalizeProgress(status.progress) > 0 || (status.results && status.results.length > 0)) {
                 statusCard.classList.remove('hidden');
                 renderStatus(status);
             }
@@ -669,8 +705,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText.textContent = autoVideo ? '脚本到视频' : '按脚本生成素材';
         } else if (source === 'ai' && autoVideo) {
             btnText.textContent = '主题到视频';
-        } else if (autoVideo) {
-            btnText.textContent = '搜素材并合成视频';
+        } else if (source === 'ai') {
+            btnText.textContent = 'AI 生成素材';
         } else {
             btnText.textContent = '开始搜素材';
         }
@@ -681,8 +717,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return status?.status === 'error' || Boolean(status?.error) || message.trim().startsWith('❌');
     }
 
+    function normalizeProgress(value) {
+        const progress = Number(value);
+        if (!Number.isFinite(progress)) return 0;
+        return Math.min(100, Math.max(0, Math.round(progress)));
+    }
+
     function renderStatus(status) {
-        const progress = Number.isFinite(Number(status.progress)) ? Number(status.progress) : 0;
+        const progress = normalizeProgress(status.progress);
         const failed = isFailureStatus(status);
         statusMsg.textContent = status.error || status.message || (failed ? '生成失败' : '处理中...');
         statusCard.classList.toggle('status-error', failed);

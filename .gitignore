@@ -11,7 +11,14 @@ downloads/
 
 # Python
 __pycache__/
+.codex_pycache*/
+.pycache_*/
+.tmp_compile*/
+codex_tmp*/
+codex_tmp*
+pytest-cache-files*/
 *.pyc
+*.pyc.*
 *.pyo
 .env
 venv/
