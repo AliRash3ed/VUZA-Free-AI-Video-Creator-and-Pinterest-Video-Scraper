@@ -277,6 +277,13 @@ POLLINATIONS_IMAGE_SEMAPHORE = asyncio.Semaphore(1)
 ALLOW_POLLINATIONS_FALLBACK = os.environ.get("ALLOW_POLLINATIONS_FALLBACK", "").lower() in {"1", "true", "yes"}
 _UNSET = object()
 
+def normalize_status_progress(progress):
+    try:
+        value = round(float(progress))
+    except (TypeError, ValueError):
+        return 0
+    return min(100, max(0, int(value)))
+
 def set_status(status=None, message=None, progress=None, error=_UNSET, final_video=_UNSET, **extra):
     if status:
         scraping_status["status"] = status
@@ -284,7 +291,7 @@ def set_status(status=None, message=None, progress=None, error=_UNSET, final_vid
     if message is not None:
         scraping_status["message"] = message
     if progress is not None:
-        scraping_status["progress"] = progress
+        scraping_status["progress"] = normalize_status_progress(progress)
     if error is not _UNSET:
         scraping_status["error"] = error
     if final_video is not _UNSET:
@@ -762,7 +769,7 @@ async def run_scrape(request: ScrapeRequest):
                         else:
                             item["_error"] = describe_empty_media_result(source, media_type)
 
-                    scraping_status["progress"] = int(((script_idx) / len(scripts)) * 100 + ((bs + len(batch)) / total) * (100 / len(scripts)) * 0.8)
+                    set_status(progress=((script_idx) / len(scripts)) * 100 + ((bs + len(batch)) / total) * (100 / len(scripts)) * 0.8)
 
                 if request.auto_video:
                     validate_scene_images(keyword_data, project_path)

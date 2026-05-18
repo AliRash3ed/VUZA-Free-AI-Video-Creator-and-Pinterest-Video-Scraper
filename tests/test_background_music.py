@@ -18,6 +18,7 @@ from app import (
     app as fastapi_app,
     local_script_segments,
     normalized_script_inputs,
+    set_status,
     run_scrape,
     scraping_status,
     resolve_background_music,
@@ -92,6 +93,19 @@ class LocalScriptSegmentTests(unittest.TestCase):
 
     def test_empty_script_produces_no_segments(self):
         self.assertEqual(local_script_segments(" \n\t "), [])
+
+
+class StatusProgressTests(unittest.TestCase):
+    def test_set_status_clamps_progress_to_api_range(self):
+        set_status(progress=-25)
+        self.assertEqual(scraping_status["progress"], 0)
+
+        set_status(progress=150.7)
+        self.assertEqual(scraping_status["progress"], 100)
+
+    def test_set_status_uses_zero_for_invalid_progress(self):
+        set_status(progress="not-a-number")
+        self.assertEqual(scraping_status["progress"], 0)
 
 
 class BackgroundMusicResolutionTests(unittest.TestCase):
