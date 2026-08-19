@@ -5,11 +5,20 @@ downloads/
 *.wav
 *.jpg
 *.png
+!static/music/
+!static/music/cinematic.mp3
 !static/screenshots/*.png
 
 # Python
 __pycache__/
+.codex_pycache*/
+.pycache_*/
+.tmp_compile*/
+codex_tmp*/
+codex_tmp*
+pytest-cache-files*/
 *.pyc
+*.pyc.*
 *.pyo
 .env
 venv/

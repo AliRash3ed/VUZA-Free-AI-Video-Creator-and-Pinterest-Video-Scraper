@@ -2,18 +2,92 @@ import asyncio
 import os
 import random
 import re
+import sys
 from pathlib import Path
 from edge_tts import Communicate
 from moviepy import VideoFileClip, ImageClip, AudioFileClip, TextClip, CompositeVideoClip, concatenate_videoclips
+from moviepy.video import fx as vfx
+
+for stream in (sys.stdout, sys.stderr):
+    if hasattr(stream, "reconfigure"):
+        stream.reconfigure(encoding="utf-8", errors="replace")
 
 # ═══════════════════════════════════════════════════════════════
 # ANTIGRAVITY VIDEO ENGINE (MOVIEPY + EDGE-TTS)
 # ═══════════════════════════════════════════════════════════════
 
+FONT_CANDIDATES = [
+    r"C:\Windows\Fonts\msyh.ttc",
+    r"C:\Windows\Fonts\msyhbd.ttc",
+    r"C:\Windows\Fonts\simhei.ttf",
+    "static/fonts/NotoSansSC-Bold.ttf",
+    "static/fonts/NotoSansSC-Regular.ttf",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    "arialbd.ttf",
+    "arial.ttf",
+]
+
+def resolve_font_path():
+    for font_path in FONT_CANDIDATES:
+        if os.path.exists(font_path):
+            return font_path
+    return None
+
+def contains_cjk(text):
+    return bool(re.search(r'[\u3400-\u9fff]', text or ""))
+
+def wrap_text_lines(text, draw, font, max_width):
+    if not text:
+        return [""]
+
+    if contains_cjk(text) and " " not in text:
+        lines, current = [], ""
+        for char in text:
+            candidate = current + char
+            if current and draw.textlength(candidate, font=font) > max_width:
+                lines.append(current)
+                current = char
+            else:
+                current = candidate
+        if current:
+            lines.append(current)
+        return lines
+
+    lines, curr_line = [], []
+    for word in text.split():
+        candidate = " ".join(curr_line + [word])
+        if curr_line and draw.textlength(candidate, font=font) > max_width:
+            lines.append(" ".join(curr_line))
+            curr_line = [word]
+        elif draw.textlength(candidate, font=font) > max_width:
+            chunk = ""
+            for char in word:
+                next_chunk = chunk + char
+                if chunk and draw.textlength(next_chunk, font=font) > max_width:
+                    lines.append(chunk)
+                    chunk = char
+                else:
+                    chunk = next_chunk
+            curr_line = [chunk] if chunk else []
+        else:
+            curr_line.append(word)
+    if curr_line:
+        lines.append(" ".join(curr_line))
+    return lines or [text]
+
+def chunk_subtitle_text(text, words_per_chunk=3, cjk_chars_per_chunk=8):
+    if contains_cjk(text) and " " not in text:
+        return [text[i:i + cjk_chars_per_chunk] for i in range(0, len(text), cjk_chars_per_chunk)] or [text]
+
+    words = text.split()
+    return [" ".join(words[i:i + words_per_chunk]) for i in range(0, len(words), words_per_chunk)] or [text]
+
 def apply_ken_burns(clip, duration):
     """Applies a slow zoom-in effect (Ken Burns)."""
-    # Slow zoom from 1.0 to 1.1 over duration
-    return clip.resized(lambda t: 1 + 0.1 * t / duration)
+    return clip
 
 def apply_zoom_in(clip, duration):
     """Dramatic zoom in."""
@@ -30,11 +104,7 @@ def apply_slide_left(clip, duration):
 
 def apply_glitch(clip, duration):
     """Simulates a glitch effect by random shifting."""
-    def glitch_pos(t):
-        if random.random() > 0.9:
-            return (random.randint(-20, 20), random.randint(-20, 20))
-        return ("center", "center")
-    return clip.with_position(glitch_pos)
+    return clip
 
 class SubtitleHelper:
     @staticmethod
@@ -159,7 +229,8 @@ class VideoEngine:
 
             # Title text
             try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 120)
+                font_path = resolve_font_path()
+                font = ImageFont.truetype(font_path, 120) if font_path else ImageFont.load_default()
             except:
                 font = ImageFont.load_default()
 
@@ -189,7 +260,6 @@ class VideoEngine:
         if settings and getattr(settings, 'watermark', False):
             logo_path = getattr(settings, 'logo_path', "static/logo.png") # default
             if os.path.exists(logo_path):
-                from moviepy import ImageClip
                 watermark_clip = ImageClip(logo_path).with_duration(10).resized(width=150).with_opacity(0.5)
         bg_audio = None
 
@@ -202,93 +272,76 @@ class VideoEngine:
             keyword = item["keyword"]
             audio_path = str(self.temp_dir / f"speech_{i}.mp3")
 
-            if not os.path.exists(audio_path): continue
+            if not os.path.exists(audio_path) or os.path.getsize(audio_path) <= 0:
+                print(f"❌ Missing TTS for scene {i + 1}: {audio_path}")
+                return None
 
             # Create Audio Clip
             audio_clip = AudioFileClip(audio_path)
             duration = audio_clip.duration + 0.5 # Add padding
 
-            # Find Media
-            # Find Media (Smart Lookup: if exact folder missing, check partial match)
-            # The keyword might have changed due to fallback (e.g. "broken soul aesthetic" -> "broken soul")
-            # We search for any folder that contains the core words.
+            # Use the exact scene assets collected by the pipeline; no cross-scene fallback.
             media_folder = None
-            all_folders = [f for f in project_path.iterdir() if f.is_dir()]
+            explicit_files = [
+                str(Path(f)) for f in item.get("_files", [])
+                if Path(f).exists() and Path(f).stat().st_size > 0
+            ]
 
             # 1. Exact try
             if (project_path / keyword).exists():
                 media_folder = project_path / keyword
-
-            # 2. Partial try (if keyword is "broken soul aesthetic", try "broken soul")
-            if not media_folder:
-                 words = keyword.split()
-                 for f in all_folders:
-                     if words[0] in f.name:
-                         media_folder = f; break
-
-            # 3. Random fallback (Use other folders if specific missing)
-            if not media_folder and all_folders:
-                 media_folder = random.choice(all_folders)
+            else:
+                safe_keyword = re.sub(r'[^\w\-]', '_', keyword)[:40]
+                if safe_keyword and (project_path / safe_keyword).exists():
+                    media_folder = project_path / safe_keyword
 
             if not media_folder:
-                 print(f"⚠️ No media found for: {keyword}")
-                 continue
+                if explicit_files:
+                    files = explicit_files
+                else:
+                    print(f"❌ No exact media folder found for scene {i + 1}: {keyword}")
+                    return None
+            else:
+                files = sorted([str(f) for f in media_folder.glob("*") if f.suffix.lower() in ['.mp4', '.jpg', '.jpeg', '.png', '.webp']])
 
-            files = sorted([str(f) for f in media_folder.glob("*") if f.suffix.lower() in ['.mp4', '.jpg', '.jpeg', '.png']])
-            if not files: continue
+            files = [f for f in files if os.path.getsize(f) > 0]
+            if not files:
+                print(f"❌ Empty media folder for scene {i + 1}: {keyword}")
+                return None
 
             # Select Visuals (Smart Logic)
             # If duration is long (> 5s), use multiple visuals if available
             visual_clip = None
 
-            if media_type == "video":
-                # Video Logic
-                # If duration > 5s, switch videos every 4s
-                if duration > 5:
-                    num_vids = int(duration / 4) + 1
-                    vid_clips = []
-                    segment_duration = duration / num_vids
+            image_exts = {'.jpg', '.jpeg', '.png', '.webp'}
+            video_exts = {'.mp4', '.mov', '.m4v', '.webm'}
+            video_files = [f for f in files if Path(f).suffix.lower() in video_exts]
+            image_files = [f for f in files if Path(f).suffix.lower() in image_exts]
+            preferred_files = video_files if media_type == "video" and video_files else (image_files or files)
+            segment_seconds = 4 if preferred_files == video_files else 3
 
-                    for k in range(num_vids):
-                        v_file = files[k % len(files)]
-                        clip = VideoFileClip(v_file)
-                        # Loop/Trim Logic for sub-clip
-                        if clip.duration < segment_duration:
-                           from moviepy.video import fx as vfx
-                           clip = clip.with_effects([vfx.Loop(duration=segment_duration)])
-                        else:
-                           clip = clip.subclipped(0, segment_duration)
-                        vid_clips.append(clip.resized(height=1080))
-
-                    visual_clip = concatenate_videoclips(vid_clips)
-                else:
-                    selected_video = random.choice(files)
-                    v_clip = VideoFileClip(selected_video)
-                    if v_clip.duration < duration:
-                        from moviepy.video import fx as vfx
-                        v_clip = v_clip.with_effects([vfx.Loop(duration=duration)])
+            def build_visual_clip(file_path, clip_duration):
+                suffix = Path(file_path).suffix.lower()
+                if suffix in video_exts:
+                    clip = VideoFileClip(file_path)
+                    if clip.duration < clip_duration:
+                        clip = clip.with_effects([vfx.Loop(duration=clip_duration)])
                     else:
-                        v_clip = v_clip.subclipped(0, duration)
-                    visual_clip = v_clip.resized(height=1080)
+                        clip = clip.subclipped(0, clip_duration)
+                    return clip.resized(height=1080)
 
+                clip = ImageClip(file_path).with_duration(clip_duration).resized(height=1080)
+                return apply_ken_burns(clip, clip_duration)
+
+            if duration > 5 and len(preferred_files) > 1:
+                num_segments = int(duration / segment_seconds) + 1
+                segment_duration = duration / num_segments
+                visual_clip = concatenate_videoclips([
+                    build_visual_clip(preferred_files[k % len(preferred_files)], segment_duration)
+                    for k in range(num_segments)
+                ])
             else:
-                # Photo Logic (Ken Burns effect optional, for now simple zoom or static)
-                # Photo Logic
-                # If duration > 5s, switch photos every 3s
-                if duration > 5:
-                    num_photos = int(duration / 3) + 1
-                    photo_clips = []
-                    segment_duration = duration / num_photos
-                    for k in range(num_photos):
-                        p_file = files[k % len(files)]
-                        clip = ImageClip(p_file).with_duration(segment_duration).resized(height=1080)
-                        photo_clips.append(clip)
-                    visual_clip = concatenate_videoclips(photo_clips)
-                else:
-                    selected_photo = random.choice(files)
-                    visual_clip = ImageClip(selected_photo).with_duration(duration)
-                    visual_clip = visual_clip.resized(height=1080)
-                    visual_clip = apply_ken_burns(visual_clip, duration)
+                visual_clip = build_visual_clip(random.choice(preferred_files), duration)
 
             # Crop/Resize Logic based on Ratio
             try:
@@ -334,18 +387,15 @@ class VideoEngine:
                 elif settings.filter == "invert":
                     visual_clip = visual_clip.with_effects([vfx.InvertColors()])
 
-            # Apply Random Transitions & Animations
-            from moviepy.video import fx as vfx
-
-            trans_type = random.choice(["fade", "zoom_in", "zoom_out", "glitch", "none"])
+            # Keep suspense videos visually stable: no random shake/glitch/zoom.
+            trans_type = random.choice(["fade", "none"])
             if trans_type == "fade":
                 visual_clip = visual_clip.with_effects([vfx.FadeIn(0.5), vfx.FadeOut(0.5)])
-            elif trans_type == "zoom_in":
-                visual_clip = apply_zoom_in(visual_clip, duration)
-            elif trans_type == "zoom_out":
-                visual_clip = apply_zoom_out(visual_clip, duration)
-            elif trans_type == "glitch":
-                visual_clip = apply_glitch(visual_clip, duration)
+
+            try:
+                visual_clip = crop_center(visual_clip, w, h)
+            except Exception as e:
+                print(f"Post-transition resize error: {e}")
 
             visual_clip = visual_clip.with_audio(audio_clip)
 
@@ -366,30 +416,13 @@ class VideoEngine:
 
                         font_size = 70 if current_style == "bold_outline" else 100 if current_style == "high_retention" else 60
                         try:
-                            # Try to find a bold font for high retention
-                            font_path = "arial.ttf"
-                            if current_style == "high_retention":
-                                # Check for common bold fonts
-                                for f in ["arialbd.ttf", "Impact.ttf", "Verdana_Bold.ttf"]:
-                                    if os.path.exists(f"/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"): # Linux
-                                        font_path = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
-                                        break
-                            font = ImageFont.truetype(font_path, font_size)
+                            font_path = resolve_font_path()
+                            font = ImageFont.truetype(font_path, font_size) if font_path else ImageFont.load_default()
                         except:
                             font = ImageFont.load_default()
 
                         # Manual multiline
-                        lines = []
-                        words = txt.split()
-                        curr_line = []
-                        for word in words:
-                            curr_line.append(word)
-                            w_text = draw.textlength(" ".join(curr_line), font=font)
-                            if w_text > w * 0.8:
-                                curr_line.pop()
-                                lines.append(" ".join(curr_line))
-                                curr_line = [word]
-                        lines.append(" ".join(curr_line))
+                        lines = wrap_text_lines(txt, draw, font, w * 0.8)
 
                         full_text = "\n".join(lines)
                         left, top, right, bottom = draw.textbbox((0, 0), full_text, font=font)
@@ -431,18 +464,14 @@ class VideoEngine:
                         if getattr(settings, 'emoji_subtitles', False):
                             display_text = SubtitleHelper.insert_emojis(sentence)
 
-                        words = display_text.split()
-                        chunk_size = 3
-                        chunks = [" ".join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
+                        chunks = chunk_subtitle_text(display_text)
                         chunk_duration = duration / len(chunks)
 
                         subs_clips = []
                         for idx, chunk in enumerate(chunks):
                             t_img = make_text_image(chunk, visual_clip.w, visual_clip.h, style)
                             t_clip = ImageClip(t_img).with_duration(chunk_duration).with_start(idx * chunk_duration)
-                            # Add a energetic pop effect and fast fade-in
-                            t_clip = t_clip.resized(lambda t: 1.0 + 0.2 * (1 - (t/chunk_duration)))
-                            t_clip = t_clip.with_opacity(lambda t: min(1.0, 5 * t / chunk_duration))
+                            t_clip = t_clip.with_opacity(0.98)
                             subs_clips.append(t_clip)
 
                         visual_clip = CompositeVideoClip([visual_clip] + subs_clips)
@@ -460,6 +489,9 @@ class VideoEngine:
 
             final_clips.append(visual_clip)
 
+        if len(final_clips) != len(script_data):
+            print(f"❌ Scene assembly incomplete: expected {len(script_data)}, got {len(final_clips)}")
+            return None
         if not final_clips: return None
 
         # Concatenate
@@ -477,7 +509,6 @@ class VideoEngine:
             from moviepy import CompositeAudioClip
             bg = AudioFileClip(bg_music).with_volume_scaled(0.1) # 10% volume
             if bg.duration < final_video.duration:
-                from moviepy.video import fx as vfx # works for audio too? actually probably need afx
                 from moviepy.audio import fx as afx
                 bg = bg.with_effects([afx.AudioLoop(duration=final_video.duration)])
             else:
@@ -489,5 +520,8 @@ class VideoEngine:
         # Export
         output_filename = self.output_dir / "final_aesthetic_video.mp4"
         final_video.write_videofile(str(output_filename), fps=24, codec='libx264', audio_codec='aac', threads=4)
+        if not output_filename.exists() or output_filename.stat().st_size <= 0:
+            print(f"❌ Video export failed or empty: {output_filename}")
+            return None
         print(f"✅ Video Saved: {output_filename}")
         return str(output_filename)

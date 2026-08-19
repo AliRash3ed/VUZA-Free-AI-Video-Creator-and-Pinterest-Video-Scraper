@@ -72,12 +72,12 @@
 - 🎬 **Auto Video Assembly** — Combines all media, voiceover & subtitles into a polished final video — automatically, with one click
 - 📐 **Smart Aspect Ratio Cropping** — Supports **9:16** (TikTok/Reels/Shorts), **16:9** (YouTube), **1:1** (Instagram Feed)
 - ⚡ **Parallel Processing** — Downloads and searches multiple items simultaneously for 3x faster results
-- 🛡️ **Universal Multi-Platform Fallback** — If one source fails, VUZA automatically tries ALL other sources + simplifies keywords + asks AI for an even simpler keyword. Almost never fails to find matching media.
+- 🛡️ **Stock Media Fallback** — For Pexels, Pixabay, and Pinterest searches, VUZA tries other sources, simplifies keywords, and can ask AI for a simpler stock-media keyword.
 - 🧠 **Custom AI Brain** — Bring your own API key, URL & model name. Works with **OpenRouter** (has free models!), **OpenAI**, **DeepSeek**, or any OpenAI-compatible API
 - 🎨 **5 AI Vibe Modes** — Aesthetic, LoFi Art, General, Futuristic, and Black & White.
 - 🪄 **AI YouTube Analyzer** — Expert script analysis to generate viral titles, descriptions, and trending hashtags.
 - 📦 **Batch Video Generation** — Create multiple videos at once by adding multiple scripts.
-- 🎼 **Background Music Library** — Choose from a selection of royalty-free background tracks.
+- 🎼 **Background Music** — Render with no music by default, or select a local cinematic track when present.
 - 🎭 **Subtitle Styling & Effects** — Choose from multiple built-in styles like "Yellow Box", "Bold Outline", and "High-Retention" (Hormozi-style).
 - 🎬 **Advanced Scene Transitions** — AI-powered random transitions including **Zoom In/Out**, **Glitch**, **Slide**, and **Fade**.
 - 🎬 **Video Filters** — Apply cinematic filters (Grayscale, Sepia, Invert) and Vibe-based color grading (Futuristic, B&W).
@@ -106,22 +106,22 @@
 ## 🖥️ How It Works
 
 ```
-📝 You paste your script or topic (motivational, educational, storytelling — anything)
+📝 Default one-click flow: paste a Chinese suspense topic or narration script
     ↓
-🤖 AI analyzes every sentence → generates a search keyword for each one
+🤖 AI splits the story into scenes and writes Seedream 4.5 image prompts
     ↓
-🔍 VUZA searches Pinterest + Pexels + Pixabay IN PARALLEL
-    ↓ (If not found → simplify keyword → try ALL sources → ask AI for simpler keyword)
-📥 Downloads the best matching HD media automatically
+🎨 Seedream 4.5 generates one cinematic vertical image per scene
     ↓
-🎙️ Generates free AI voiceover for each sentence (Edge TTS — $0 cost)
+🎙️ VUZA generates free voiceover for each sentence (Edge TTS — $0 cost)
     ↓
-📝 Renders beautiful auto subtitles onto the video
+📝 Renders high-retention subtitles onto the video
     ↓
-🎬 Assembles the final video with smart aspect ratio cropping
+🎬 Assembles the final 9:16 video with transitions, filters, and optional music
     ↓
 ✅ Done! Your video is ready to download and post.
 ```
+
+Optional stock-media flow: switch the source to Pinterest, Pexels, or Pixabay and VUZA will search/download HD media instead of generating Seedream images. Stock searches use the fallback ladder below when keywords are hard to match.
 
 ---
 
@@ -181,13 +181,14 @@ python app.py
 
 🎉 Open **http://localhost:8000** in your browser and start creating!
 
-### API Keys Setup (All Free!)
+### API Keys Setup
 
-VUZA uses **100% free APIs** (except ElevenLabs which is optional). Getting keys takes 2 minutes:
+VUZA can use free stock-media APIs, plus your own OpenAI-compatible LLM and Seedream 4.5 credentials for AI image generation. Getting the API keys only takes a few minutes:
 
 | Service | Get Free Key | What It Does |
 |---------|-------------|-------------|
 | **OpenRouter** | [openrouter.ai/keys](https://openrouter.ai/keys) | AI keyword extraction — has many completely free models! |
+| **Volcengine Ark / Seedream 4.5** | [console.volcengine.com/ark](https://console.volcengine.com/ark) | Required for AI image mode and one-click Seedream video generation |
 | **Pexels** | [pexels.com/api](https://www.pexels.com/api/new/) | Free stock videos & photos API |
 | **Pixabay** | [pixabay.com/api](https://pixabay.com/api/docs/) | Free stock videos & photos API |
 
@@ -221,9 +222,9 @@ The T4 GPU makes video rendering **much faster** than most laptops. Plus you get
 
 ---
 
-## 🛡️ Universal Fallback System
+## 🛡️ Stock Media Fallback System
 
-VUZA's fallback system ensures you **almost always** get matching visuals, even for difficult or abstract keywords. Here's exactly how it works:
+VUZA's stock-media fallback system helps Pexels, Pixabay, and Pinterest searches recover from difficult or abstract keywords. AI image mode is separate: it requires a configured Seedream 4.5 API key by default.
 
 ```
 Step 1 → Try PRIMARY source with original AI-generated keyword
@@ -235,7 +236,7 @@ Step 5 → If STILL nothing → Ask AI: "Give me ONE ultra-simple keyword
 Step 6 → Try that AI-suggested keyword on Pexels + Pixabay
 ```
 
-**Result:** Even if your script uses unusual, poetic, or abstract language, VUZA will find matching HD visuals. This system is unique to VUZA.
+**Result:** Stock-media mode gets multiple recovery attempts before giving up. Seedream AI image mode requires both the LLM key and Seedream key up front. The legacy AI-image fallback is only available after stock-media searches fail, an LLM is available, and `ALLOW_POLLINATIONS_FALLBACK=1` is explicitly set; it still prefers Seedream when a Seedream key is provided, otherwise it falls back to Pollinations.
 
 ---
 
@@ -280,7 +281,7 @@ python app.py
 - [x] ✅ Edge TTS free voiceover (multiple voices)
 - [x] ✅ Auto subtitle generation & PIL rendering
 - [x] ✅ Auto video assembly with smart aspect ratio cropping
-- [x] ✅ Multi-platform fallback with AI re-ask (never fails)
+- [x] ✅ Stock-media fallback with AI re-ask for simpler keywords
 - [x] ✅ Parallel downloading & searching (3x faster)
 - [x] ✅ Custom AI Brain (bring your own API key, URL & model)
 - [x] ✅ Auto-Video ON/OFF toggle
@@ -288,7 +289,7 @@ python app.py
 - [x] ✅ Privacy-first API key storage (browser localStorage only)
 - [x] ✅ Google Colab support with T4 GPU
 - [x] ✅ Universal search with keyword simplification
-- [x] ✅ Background music library (Serenity, Adventure, LoFi, Cinematic)
+- [x] ✅ Background music option (no music by default; optional local cinematic track)
 - [x] ✅ Batch video generation (multiple videos at once)
 - [x] ✅ Video templates for different niches (Motivational, Educational, News, etc.)
 - [x] ✅ Multi-language voiceover & subtitles (10+ languages)
@@ -299,7 +300,7 @@ python app.py
 - [x] ✅ AI YouTube Analyzer (Viral titles, descriptions, hashtags)
 - [x] ✅ **URL to Video** — Scrape any blog post or news article and turn it into a video automatically.
 - [x] ✅ **"Hormozi-Style" Dynamic Captions** — High-energy, colorful, word-by-word subtitles with auto-emoji insertion.
-- [x] ✅ **AI Visual Fallback (Pollinations.ai)** — If stock media is missing, VUZA uses AI to generate high-quality cinematic images.
+- [x] ✅ **Seedream 4.5 AI Image Generation** — AI image mode generates cinematic visuals with configured LLM and Seedream keys; stock-media failures can use the legacy AI-image fallback only when an LLM is available and `ALLOW_POLLINATIONS_FALLBACK=1`, preferring Seedream when keyed and Pollinations otherwise.
 - [x] ✅ **Auto-Thumbnail Creator** — Generates a high-CTR YouTube thumbnail using frames from your video and viral titles.
 - [x] ✅ **Watermarking & Branding** — Add your own logo or watermark to all your videos automatically.
 - [x] ✅ **Custom Voice IDs** — Support for voice cloning and specific custom voices from ElevenLabs.
@@ -361,7 +362,7 @@ Here are some other tools in the same space:
 **What makes VUZA unique:**
 1. ✅ **Actually works end-to-end** without breaking
 2. 📌 **World's first free Pinterest video scraper** (no other tool has this)
-3. 🛡️ **Universal fallback system** (tries 3 platforms + AI re-ask)
+3. 🛡️ **Stock-media fallback system** (tries 3 platforms + AI re-ask)
 4. 💻 **Runs on any PC** (no GPU needed, no ComfyUI needed)
 5. ⚡ **2-minute setup** (just pip install and run)
 6. 🧠 **Bring your own AI** (works with any OpenAI-compatible API)
